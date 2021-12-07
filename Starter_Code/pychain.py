@@ -1,26 +1,3 @@
-# PyChain Ledger
-################################################################################
-# You’ll make the following updates to the provided Python file for this
-# Challenge, which already contains the basic `PyChain` ledger structure that
-# you created throughout the module:
-
-# Step 1: Create a Record Data Class
-# * Create a new data class named `Record`. This class will serve as the
-# blueprint for the financial transaction records that the blocks of the ledger
-# will store.
-
-# Step 2: Modify the Existing Block Data Class to Store Record Data
-# * Change the existing `Block` data class by replacing the generic `data`
-# attribute with a `record` attribute that’s of type `Record`.
-
-# Step 3: Add Relevant User Inputs to the Streamlit Interface
-# * Create additional user input areas in the Streamlit application. These
-# input areas should collect the relevant information for each financial record
-# that you’ll store in the `PyChain` ledger.
-
-# Step 4: Test the PyChain Ledger by Storing Records
-# * Test your complete `PyChain` ledger.
-
 ################################################################################
 # Imports
 import streamlit as st
@@ -43,18 +20,18 @@ import hashlib
 # 3. Add an attribute named `sender` of type `str`.
 # 4. Add an attribute named `receiver` of type `str`.
 # 5. Add an attribute named `amount` of type `float`.
-# Note that you’ll use this new `Record` class as the data type of your `record` attribute in the next section.
+# Note that you'll use this new `Record` class as the data type of your `record` attribute in the next section.
 
 
 # @TODO
 # Create a Record Data Class that consists of the `sender`, `receiver`, and
 # `amount` attributes
+
+@dataclass
 class Record:
-    sender: str = "0"
-    receiver: str = "0"
-    amount: float = 0
-
-
+    sender: str
+    receiver: str
+    amount: float
 ################################################################################
 # Step 2:
 # Modify the Existing Block Data Class to Store Record Data
@@ -71,12 +48,13 @@ class Block:
 
     # @TODO
     # Rename the `data` attribute to `record`, and set the data type to `Record`
-     record: Record()
+    # data: Any
+    record: Record
 
     creator_id: int
-    prev_hash: str = '0'
+    prev_hash: str = "0"
     timestamp: str = datetime.datetime.utcnow().strftime("%H:%M:%S")
-    nonce: str = 0
+    nonce: int = 0
 
     def hash_block(self):
         sha = hashlib.sha256()
@@ -159,7 +137,7 @@ pychain = setup()
 
 # Code additional input areas for the user interface of your Streamlit
 # application. Create these input areas to capture the sender, receiver, and
-# amount for each transaction that you’ll store in the `Block` record.
+# amount for each transaction that you'll store in the `Block` record.
 # To do so, complete the following steps:
 # 1. Delete the `input_data` variable from the Streamlit interface.
 # 2. Add an input area where you can get a value for `sender` from the user.
@@ -173,16 +151,15 @@ input_data = st.text_input("Block Data")
 
 # @TODO:
 # Add an input area where you can get a value for `sender` from the user.
-sender_name = st.text_input("Please give the name of the Sender")
+sender = st.text_input("Sender Data")
 
 # @TODO:
 # Add an input area where you can get a value for `receiver` from the user.
-# YOUR CODE HERE
-receiver_name = st.text_input("Please give the name of the receiver.")
+receiver = st.text_input("Receiver Data")
 
 # @TODO:
 # Add an input area where you can get a value for `amount` from the user.
-tx_amount = st.number_input("Please give the amount of the Transaction.")
+amount = st.text_input("Amount")
 
 if st.button("Add Block"):
     prev_block = pychain.chain[-1]
@@ -193,8 +170,9 @@ if st.button("Add Block"):
     # which is set equal to a `Record` that contains the `sender`, `receiver`,
     # and `amount` values
     new_block = Block(
+        # data=input_data,
+        record=Record(sender, receiver, amount),
         creator_id=42,
-        record = Record(sender=sender_name, receiver=receiver_name, amount=tx_amount),
         prev_hash=prev_block_hash
     )
 
@@ -206,7 +184,7 @@ if st.button("Add Block"):
 
 st.markdown("## The PyChain Ledger")
 
-pychain_df = pd.DataFrame(pychain.chain)
+pychain_df = pd.DataFrame(pychain.chain).astype(str)
 st.write(pychain_df)
 
 difficulty = st.sidebar.slider("Block Difficulty", 1, 5, 2)
@@ -244,6 +222,7 @@ if st.button("Validate Chain"):
 # Take a screenshot of the Streamlit application page, which should detail a
 # blockchain that consists of multiple blocks. Include the screenshot in the
 # `README.md` file for your Challenge repository.
+
 
 # 5. Test the blockchain validation process by using the web interface.
 # Take a screenshot of the Streamlit application page, which should indicate
